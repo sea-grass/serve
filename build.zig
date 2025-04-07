@@ -21,14 +21,6 @@ pub fn build(b: *std.Build) void {
 
     exe_mod.addImport("serve_lib", lib_mod);
 
-    const lib = b.addLibrary(.{
-        .linkage = .static,
-        .name = "serve",
-        .root_module = lib_mod,
-    });
-
-    b.installArtifact(lib);
-
     const exe = b.addExecutable(.{
         .name = "serve",
         .root_module = exe_mod,
