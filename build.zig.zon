@@ -1,0 +1,17 @@
+.{
+    .name = .serve,
+    .version = "0.0.1",
+    .fingerprint = 0x67609daaca12212f, // Changing this has security and trust implications.
+    .minimum_zig_version = "0.14.0",
+    .dependencies = .{
+        .httpz = .{
+            .url = "git+https://github.com/karlseguin/http.zig?ref=master#17c4e084070a073a1181b99851ffd7431540dd32",
+            .hash = "httpz-0.0.0-PNVzrIy3BgDgdnHkLiGTcyTERdexaynpckqWMsw12-q5",
+        },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}
