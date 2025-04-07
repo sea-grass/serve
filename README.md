@@ -33,7 +33,7 @@ Alternatively, you can build an optimized executable by building in release mode
 # build in release mode
 zig build -Doptimize=ReleaseSafe
 # or, build a release binary optimized for size
-zig build -Doptimize=ReleaseFast
+zig build -Doptimize=ReleaseSmall
 ```
 
 ## Alternatives
