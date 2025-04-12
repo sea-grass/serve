@@ -4,6 +4,20 @@ pub const Server = httpz.Server(*const App);
 pub const Config = httpz.Config;
 
 pub fn handle(self: *const App, req: *httpz.Request, res: *httpz.Response) void {
+    switch (req.method) {
+        .GET => {},
+        .HEAD => {
+            res.status = 501;
+            res.body = "Not implemented";
+            return;
+        },
+        else => {
+            res.status = 405;
+            res.body = "Method not allowed";
+            return;
+        },
+    }
+
     // Prevent malicious requests like GET //etc/hosts
     if (mem.containsAtLeast(u8, req.url.path, 1, "//")) {
         res.status = 400;
