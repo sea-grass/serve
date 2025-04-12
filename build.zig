@@ -4,6 +4,18 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
+    const options = b.addOptions();
+    options.addOption(
+        bool,
+        "additional_redirect",
+        b.option(
+            bool,
+            "additional_redirect",
+            "Redirect 404 requests without an extension to their directory variant if an index file exists.",
+        ) orelse false,
+    );
+    const options_module = options.createModule();
+
     const httpz = b.dependency("httpz", .{ .target = target, .optimize = optimize });
 
     const lib_mod = b.createModule(.{
@@ -12,6 +24,7 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
     lib_mod.addImport("httpz", httpz.module("httpz"));
+    lib_mod.addImport("options", options_module);
 
     const exe_mod = b.createModule(.{
         .root_source_file = b.path("src/main.zig"),

@@ -11,6 +11,12 @@ Serve is a small command-line utility to serve files via localhost.
 - Index file mapping (e.g. `GET /some-path/` maps to the file `some-path/index.html`)
 - File extension-based content-type header
 
+### Optional features
+
+These features are only enabled if Serve is built with the corresponding flag enabled.
+
+- `-Dadditional_redirect` - Redirect file requests where instead a directory exists on the filesystem to a directory request (e.g. `GET /some-path` -> `GET /some-path/`)
+
 ## Supported Zig version
 
 Serve is tested with Zig `0.14.0`. Your mileage may vary on other versions. If you encounter an issue, patches are encouraged.

@@ -33,7 +33,19 @@ pub fn handle(self: *const App, req: *httpz.Request, res: *httpz.Response) void 
     defer dir.close();
 
     const sub_path = filePath(req);
-    serveFile(&dir, sub_path, res) catch {
+    serveFile(&dir, sub_path, res) catch |err| {
+        if (options.additional_redirect and err == error.IsDir) {
+            const path = fmt.allocPrint(req.arena, "{s}/", .{req.url.path}) catch {
+                res.status = 500;
+                res.body = "Internal server error";
+                return;
+            };
+            res.status = 302;
+            res.header("Location", path);
+            return;
+        }
+
+        std.log.info("error: {any}", .{err});
         res.status = 404;
         res.body = "Not found";
         return;
@@ -119,7 +131,9 @@ const FilePath = union(enum) {
 };
 
 const App = @This();
+const fmt = std.fmt;
 const fs = std.fs;
 const httpz = @import("httpz");
 const mem = std.mem;
+const options = @import("options");
 const std = @import("std");
