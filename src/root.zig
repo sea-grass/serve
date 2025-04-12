@@ -25,7 +25,6 @@ pub fn handle(self: *const App, req: *httpz.Request, res: *httpz.Response) void 
         return;
     }
 
-    const sub_path = filePath(req);
     var dir = fs.cwd().openDir(self.path, .{}) catch {
         res.status = 500;
         res.body = "Internal server error";
@@ -33,6 +32,7 @@ pub fn handle(self: *const App, req: *httpz.Request, res: *httpz.Response) void 
     };
     defer dir.close();
 
+    const sub_path = filePath(req);
     serveFile(&dir, sub_path, res) catch {
         res.status = 404;
         res.body = "Not found";
@@ -40,38 +40,55 @@ pub fn handle(self: *const App, req: *httpz.Request, res: *httpz.Response) void 
     };
 }
 
-fn filePath(req: *httpz.Request) []const u8 {
+fn filePath(req: *httpz.Request) FilePath {
     std.log.info("{s}", .{req.url.path});
     if (mem.eql(u8, req.url.path, "/")) {
-        return "index.html";
+        return .{ .file = "index.html" };
     }
 
     if (mem.endsWith(u8, req.url.path, "/")) {
-        return std.fmt.allocPrint(req.arena, "{s}index.html", .{req.url.path[1..]}) catch @panic("Could not allocate enough memory to satisfy this request.");
+        return .{ .directory = req.url.path[1..] };
     }
 
-    return req.url.path[1..];
+    return .{ .file = req.url.path[1..] };
 }
 
-fn serveFile(dir: *fs.Dir, sub_path: []const u8, res: *httpz.Response) !void {
-    var file = try dir.openFile(sub_path, .{});
-    defer file.close();
+fn serveFile(dir: *fs.Dir, sub_path: FilePath, res: *httpz.Response) !void {
+    switch (sub_path) {
+        .directory => |path| {
+            var sub_dir = try dir.openDir(path, .{});
+            defer sub_dir.close();
+            var file = try sub_dir.openFile("index.html", .{});
+            defer file.close();
 
-    var fifo: std.fifo.LinearFifo(u8, .{ .Static = 1024 }) = .init();
-    try fifo.pump(file.reader(), res.writer());
+            var fifo: std.fifo.LinearFifo(u8, .{ .Static = 1024 }) = .init();
+            try fifo.pump(file.reader(), res.writer());
 
-    if (Mime.match(sub_path)) |mime| {
-        res.header("Content-Type", mime.contentType());
+            res.header("Content-Type", Mime.html.contentType());
+        },
+        .file => |path| {
+            var file = try dir.openFile(path, .{});
+            defer file.close();
+
+            var fifo: std.fifo.LinearFifo(u8, .{ .Static = 1024 }) = .init();
+            try fifo.pump(file.reader(), res.writer());
+
+            if (Mime.match(path)) |mime| {
+                res.header("Content-Type", mime.contentType());
+            }
+        },
     }
 }
 
 const Mime = enum {
-    wasm,
+    html,
     javascript,
+    wasm,
 
     const ExtensionMap: std.EnumArray(Mime, []const []const u8) = .init(.{
-        .wasm = &.{ ".wasm.a", ".wasm" },
+        .html = &.{".html"},
         .javascript = &.{".js"},
+        .wasm = &.{ ".wasm.a", ".wasm" },
     });
 
     pub fn match(file_name: []const u8) ?Mime {
@@ -89,10 +106,16 @@ const Mime = enum {
 
     pub fn contentType(mime: Mime) []const u8 {
         return switch (mime) {
-            .wasm => "application/wasm",
+            .html => "text/html",
             .javascript => "text/javascript",
+            .wasm => "application/wasm",
         };
     }
+};
+
+const FilePath = union(enum) {
+    file: []const u8,
+    directory: []const u8,
 };
 
 const App = @This();
