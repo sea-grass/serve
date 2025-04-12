@@ -38,7 +38,9 @@ zig build -Doptimize=ReleaseSmall
 
 ## Alternatives
 
-Serve is meant to be used as a local development tool to serve files via localhost only. If you are looking for a static server to run on your production system, this is not it. Instead, consider something like nginx.
+Serve is meant to be used as a local development tool to serve files via localhost only. If you are looking for a static server to run on your production system, this is not it. For production, consider something like nginx.
+
+An alternative you could consider is the [Python 3 built-in module `http.server`](https://docs.python.org/3/library/http.server.html).
 
 ## Contributions
 
