@@ -4,7 +4,7 @@ Serve is a small command-line utility to serve files via localhost.
 
 ## Features
 
-- Local HTTP server (always `http://127.0.0.1:3000`)
+- Local HTTP server (by default `http://127.0.0.1:3000`)
 - Specified directory path (as a command line argument)
 - File server (all files from within this directory path)
 - Request path mapping (e.g. `GET /app.js` -> `app.js`)
@@ -15,7 +15,9 @@ Serve is a small command-line utility to serve files via localhost.
 
 These features are only enabled if Serve is built with the corresponding flag enabled.
 
-- `-Dadditional_redirect` - Redirect file requests where instead a directory exists on the filesystem to a directory request (e.g. `GET /some-path` -> `GET /some-path/`)
+- `-Dadditional_redirect` (default: `false`) - Redirect file requests where instead a directory exists on the filesystem to a directory request (e.g. `GET /some-path` -> `GET /some-path/`)
+- `-Dhost` (default: `127.0.0.1`)
+- `-Dport` (default: `3000`)
 
 ## Supported Zig version
 

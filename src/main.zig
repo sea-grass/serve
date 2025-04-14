@@ -1,6 +1,6 @@
 const app_config: App.Config = .{
-    .address = "127.0.0.1",
-    .port = 3000,
+    .address = options.host,
+    .port = options.port,
 };
 
 pub fn main() !void {
@@ -38,5 +38,6 @@ const App = @import("serve_lib");
 const fs = std.fs;
 const heap = std.heap;
 const log = std.log.scoped(.serve);
+const options = @import("options");
 const process = std.process;
 const std = @import("std");

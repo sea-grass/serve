@@ -14,6 +14,25 @@ pub fn build(b: *std.Build) void {
             "Redirect 404 requests without an extension to their directory variant if an index file exists.",
         ) orelse false,
     );
+    options.addOption(
+        []const u8,
+        "host",
+        b.option(
+            []const u8,
+            "host",
+            "The host on which to listen to requests.",
+        ) orelse "127.0.0.1",
+    );
+    options.addOption(
+        u16,
+        "port",
+        b.option(
+            u16,
+            "port",
+            "The port on which to listen to requests.",
+        ) orelse 3000,
+    );
+
     const options_module = options.createModule();
 
     const httpz = b.dependency("httpz", .{ .target = target, .optimize = optimize });
@@ -33,6 +52,7 @@ pub fn build(b: *std.Build) void {
     });
 
     exe_mod.addImport("serve_lib", lib_mod);
+    exe_mod.addImport("options", options_module);
 
     const exe = b.addExecutable(.{
         .name = "serve",
