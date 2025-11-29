@@ -2,11 +2,11 @@
     .name = .serve,
     .version = "0.0.1",
     .fingerprint = 0x67609daaca12212f, // Changing this has security and trust implications.
-    .minimum_zig_version = "0.14.0",
+    .minimum_zig_version = "0.15.2",
     .dependencies = .{
         .httpz = .{
-            .url = "git+https://github.com/karlseguin/http.zig?ref=dev#bab4296f0b4c99aec60b5c0339848aebc0254a50",
-            .hash = "httpz-0.0.0-PNVzrMK3BgAntHQ7y_vXZ4Q2yKKM0py7_KnwKoPv3aep",
+            .url = "git+https://github.com/karlseguin/http.zig#a4477b1dbdc5b820fd4ad301797ca6399f7eb6e4",
+            .hash = "httpz-0.0.0-PNVzrBgtBwCVkSJyophIX6WHwDR0r8XhBGQr96Kk-1El",
         },
     },
     .paths = .{

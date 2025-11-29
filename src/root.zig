@@ -72,18 +72,28 @@ fn serveFile(dir: *fs.Dir, sub_path: FilePath, res: *httpz.Response) !void {
             defer sub_dir.close();
             var file = try sub_dir.openFile("index.html", .{});
             defer file.close();
+            var buf: [1024]u8 = undefined;
+            var file_reader: std.fs.File.Reader = .init(file, &buf);
 
-            var fifo: std.fifo.LinearFifo(u8, .{ .Static = 1024 }) = .init();
-            try fifo.pump(file.reader(), res.writer());
+            _ = try std.Io.Reader.stream(
+                &file_reader.interface,
+                res.writer(),
+                .unlimited,
+            );
 
             res.header("Content-Type", Mime.html.contentType());
         },
         .file => |path| {
             var file = try dir.openFile(path, .{});
             defer file.close();
+            var buf: [1024]u8 = undefined;
+            var file_reader: std.fs.File.Reader = .init(file, &buf);
 
-            var fifo: std.fifo.LinearFifo(u8, .{ .Static = 1024 }) = .init();
-            try fifo.pump(file.reader(), res.writer());
+            _ = try std.Io.Reader.stream(
+                &file_reader.interface,
+                res.writer(),
+                .unlimited,
+            );
 
             if (Mime.match(path)) |mime| {
                 res.header("Content-Type", mime.contentType());
